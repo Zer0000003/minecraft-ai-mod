@@ -1,5 +1,7 @@
 package com.zer0.mcbridge;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import net.minecraft.client.MinecraftClient;
 
 import java.net.URI;
@@ -94,24 +96,37 @@ public final class BridgeSocketClient implements WebSocket.Listener {
     }
 
     private void handleIncoming(String rawJson) {
-        String type = jsonValue(rawJson, "type");
-        if (type == null) {
+        final JsonObject payload;
+        try {
+            payload = JsonParser.parseString(rawJson).getAsJsonObject();
+        } catch (Exception ex) {
             statusConsumer.accept("invalid payload: " + rawJson);
+            return;
+        }
+
+        String type = getString(payload, "type");
+        if (type == null) {
+            statusConsumer.accept("missing command type");
             return;
         }
 
         switch (type) {
             case "chat" -> {
-                String text = jsonValue(rawJson, "text");
+                String text = getString(payload, "text");
                 commandConsumer.accept(client -> {
-                    if (client.player != null && text != null) {
+                    if (client.player != null && text != null && !text.isBlank()) {
                         client.player.networkHandler.sendChatMessage(text);
                     }
                 });
             }
-            case "system" -> statusConsumer.accept(jsonValue(rawJson, "text"));
+            case "system" -> {
+                String text = getString(payload, "text");
+                if (text != null) {
+                    statusConsumer.accept(text);
+                }
+            }
             case "move" -> {
-                String direction = jsonValue(rawJson, "direction");
+                String direction = getString(payload, "direction");
                 commandConsumer.accept(client -> performMove(client, direction));
             }
             default -> statusConsumer.accept("unknown command type: " + type);
@@ -130,18 +145,8 @@ public final class BridgeSocketClient implements WebSocket.Listener {
         }
     }
 
-    private static String jsonValue(String json, String key) {
-        String pattern = "\"" + key + "\":\"";
-        int start = json.indexOf(pattern);
-        if (start < 0) {
-            return null;
-        }
-        start += pattern.length();
-        int end = json.indexOf('"', start);
-        if (end < 0) {
-            return null;
-        }
-        return json.substring(start, end);
+    private static String getString(JsonObject object, String key) {
+        return object.has(key) && object.get(key).isJsonPrimitive() ? object.get(key).getAsString() : null;
     }
 
     private static String escape(String s) {

@@ -1,4 +1,4 @@
-# Zer0 Minecraft Bridge Mod (Fabric)
+# Zer0 Minecraft Bridge Mod (Fabric, CurseForge-ready)
 
 This mod connects your Minecraft client to your **Zer0** project using WebSockets so Zer0 can:
 
@@ -12,11 +12,12 @@ This mod connects your Minecraft client to your **Zer0** project using WebSocket
 2. Edit `src/main/resources/zer0-bridge.properties`:
    - `url`: Zer0 server URL
    - `apiKey`: auth key sent as `X-Api-Key`
-3. Build the mod:
+3. Build the mod (with your local Gradle install for now):
    ```bash
-   ./gradlew build
+   gradle build
    ```
-4. Drop the generated jar from `build/libs/` into your Fabric `mods/` folder.
+4. Upload `build/libs/zer0-minecraft-bridge-<version>.jar` to CurseForge as a **Fabric** mod for **Minecraft 1.20.1**.
+5. Or drop that jar into your local Fabric `mods/` folder.
 
 ## In-game commands
 
@@ -26,7 +27,7 @@ This mod connects your Minecraft client to your **Zer0** project using WebSocket
 
 ## Zer0 message format
 
-Incoming messages are simple JSON strings:
+Incoming messages are JSON objects:
 
 ```json
 {"type":"chat","text":"Hello from Zer0!"}
