@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "zer0_mc_bridge",
+  "version": "${version}",
+  "name": "Zer0 Minecraft Bridge",
+  "description": "Connects Minecraft to an external Zer0 AI service over WebSocket.",
+  "authors": ["You"],
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "com.zer0.mcbridge.Zer0BridgeClient"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.15.0",
+    "minecraft": "1.20.1",
+    "fabric-api": "*",
+    "java": ">=17"
+  }
+}
